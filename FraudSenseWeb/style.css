@@ -91,6 +91,7 @@ header {
 /* Brand text styling for FraudSense */
 .fraud-sense-brand {
   display: inline-block;
+  border-radius : 25px;
 }
 
 .fraud-sense-brand .fraud {
@@ -98,7 +99,7 @@ header {
 }
 
 .fraud-sense-brand .sense {
-  color: #bb9cdd;
+  color: var(--primary-light);
   text-shadow: 0 0 1px rgba(94, 53, 177, 0.3);
 }
 
