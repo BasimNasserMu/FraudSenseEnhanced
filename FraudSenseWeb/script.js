@@ -1,12 +1,5 @@
 // Import Firebase configuration and initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAjNjtdkx5AA52mye-P0kkyOElXSEZgHxY",
-  authDomain: "fraudsense-a1fb8.firebaseapp.com",
-  projectId: "fraudsense-a1fb8",
-  storageBucket: "fraudsense-a1fb8.firebasestorage.app",
-  messagingSenderId: "350345238242",
-  appId: "1:350345238242:web:856b636bd79c8d064730bb"
-};
+import { BASE_URL, firebaseConfig } from './config.js';
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -14,7 +7,6 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // Backend API URL
-import { BASE_URL } from './config.js';
 
 // Global variables
 let riskDistributionChart = null;
