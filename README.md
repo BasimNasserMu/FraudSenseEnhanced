@@ -1,7 +1,5 @@
 # FraudSenseEnhanced
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) <!-- Example badge - Replace if needed -->
-
 FraudSenseEnhanced is a web application designed for real-time transaction fraud detection using a machine learning model. It provides a user-friendly interface for analyzing individual transactions or batches via CSV upload, along with user authentication, data management, and administrative features.
 
 <!-- Optional: Add a screenshot here -->
@@ -49,7 +47,7 @@ FraudSenseEnhanced is a web application designed for real-time transaction fraud
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/your-username/FraudSenseEnhanced.git # Replace with your repo URL
+    git clone https://github.com/BasimNasserMu/FraudSenseEnhanced.git
     cd FraudSenseEnhanced
     ```
 
