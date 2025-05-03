@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FraudSense - Credit Card Fraud Detection</title>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Login/Signup Overlay -->
+  <div id="auth-overlay" class="auth-overlay active">
+    <div class="auth-container">
+      <div class="auth-brand">
+        <img src="favicon.png" alt="FraudSense Logo" />
+        <h1><span class="fraud">Fraud</span><span class="sense">Sense</span></h1>
+        <div class="tagline">Credit Card Fraud Detection System</div>
+      </div>
+      <div class="auth-toggle">
+        <button id="show-login-btn" class="auth-toggle-btn active">Login</button>
+        <button id="show-signup-btn" class="auth-toggle-btn">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form active">
+        <h2>Login to an Existing Account</h2>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button id="login-btn" class="primary-button">Login</button>
+        <p id="login-error" class="error-message"></p>
+      </div>
+
+      <!-- Signup Form -->
+      <div id="signup-form" class="auth-form">
+        <h2>Create Account</h2>
+        <input type="text" id="signup-displayname" placeholder="Display Name" required>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required>
+        <button id="signup-btn" class="primary-button">Sign Up</button>
+        <p id="signup-error" class="error-message"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Container (Initially Hidden) -->
+  <div id="app-container" class="container hidden">
+    <header>
+      <div class="logo-container">
+        <img src="favicon.png" alt="FraudSense Logo" class="logo-icon" />
+        <h1 class="fraud-sense-brand"><span class="fraud">Fraud</span><span class="sense">Sense</span></h1>
+        <span class="tagline">Credit Card Fraud Detection System</span>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" class="active" data-page="home">Home</a></li>
+          <li><a href="#" data-page="dashboard">Dashboard</a></li>
+          <li><a href="#" data-page="feedback">Feedback</a></li>
+          <li><a href="#" data-page="settings">Settings</a></li>
+          <li id="admin-nav-item" style="display: none;"><a href="#" data-page="admin">Admin</a></li>
+        </ul>
+      </nav>
+      <div class="header-controls">
+        <div class="user-info">
+          <span id="user-displayname" class="user-displayname"></span>
+          <span id="user-email" class="user-email"></span>
+        </div>
+        <button id="logout-btn" class="secondary-button">Logout</button>
+        <button id="themeToggle" class="theme-toggle-button">
+          <span class="material-icons">brightness_4</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="home-page" class="page active">
+      <div class="analysis-mode-selector">
+        <h2>Transaction Analysis</h2>
+        <p>Choose how you want to analyze transactions for fraud risk assessment.</p>
+        
+        <div class="toggle-container">
+          <button id="batchModeButton" class="toggle-button active">
+            <span class="material-icons">upload_file</span> Batch Analysis
+          </button>
+          <button id="singleModeButton" class="toggle-button">
+            <span class="material-icons">search</span> Single Analysis
+          </button>
+        </div>
+      </div>
+
+      <div id="batch-analysis" class="section analysis-section active">
+        <h2>Batch Transaction Analysis</h2>
+        <p>Upload a CSV file containing multiple transactions for fraud risk assessment.</p>
+        
+        <div class="input-group">
+          <label for="csvMerchantName">Merchant Name:</label>
+          <input type="text" id="csvMerchantName" placeholder="Enter merchant name for all transactions" />
+        </div>
+        
+        <div class="file-upload-container">
+          <label class="custom-file-upload">
+            <span><span class="material-icons">upload_file</span> Choose CSV File</span>
+            <input type="file" id="csvInput" accept=".csv" />
+          </label>
+          <div id="fileNameDisplay" class="file-name-display">
+            <span class="material-icons">description</span>
+            <span id="selectedFileName">No file selected</span>
+          </div>
+          <button id="uploadCsvButton" class="primary-button">
+            <span class="material-icons">send</span> Analyze Transactions
+          </button>
+        </div>
+        
+        <div id="csvLoading" class="loading-indicator hidden">Processing transactions...</div>
+        <div id="csvResult" class="result-container">
+          <!-- Table wrapper will be inserted here by JavaScript -->
+        </div>
+      </div>
+
+      <div id="single-analysis" class="section analysis-section">
+        <h2>Single Transaction Analysis</h2>
+        <p>Enter transaction data for individual fraud risk assessment.</p>
+        
+        <div class="input-group">
+          <label for="jsonMerchantName">Merchant Name:</label>
+          <input type="text" id="jsonMerchantName" placeholder="Enter merchant name for this transaction" />
+        </div>
+        
+        <textarea id="jsonInput" placeholder=\'{"V1": value1, "V2": value2, ..., "Amount": valueX} or comma/space/tab separated values V1..V28, Amount\'></textarea>
+        <p class="input-help">Accepts JSON object for a single transaction or 29 comma/space/tab-separated values (V1-V28, Amount).</p>
+        
+        <div class="button-group">
+          <button id="sendJsonButton" class="primary-button">
+            <span class="material-icons">search</span> Analyze Transaction
+          </button>
+          <button id="generateRandomButton" class="secondary-button">
+            <span class="material-icons">casino</span> Generate Random
+          </button>
+        </div>
+        
+        <div id="jsonLoading" class="loading-indicator hidden">Processing transaction...</div>
+        <div id="jsonResult" class="result-container"></div>
+      </div>
+    </div>
+
+    <div id="dashboard-page" class="page">
+      <div class="page-header">
+        <h2>Transaction Dashboard</h2>
+        <div class="dashboard-controls">
+          <button id="refreshDashboard" class="secondary-button">
+            <span class="material-icons">refresh</span> Refresh
+          </button>
+          <div class="filter-controls">
+            <select id="categoryFilter">
+              <option value="all">All Risk Levels</option>
+              <option value="high">High Risk</option>
+              <option value="medium">Medium Risk</option>
+              <option value="low">Low Risk</option>
+            </select>
+            <input type="text" id="merchantFilter" placeholder="Filter by merchant...">
+          </div>
+        </div>
+      </div>
+      
+      <div id="dashboardLoading" class="loading-indicator hidden">Loading dashboard data...</div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card summary-stats">
+          <h3>Risk Summary</h3>
+          <div id="summaryStats">
+            <div class="stat-item">
+              <span class="stat-label">Total Transactions</span>
+              <span class="stat-value" id="totalTransactions">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">High Risk</span>
+              <span class="stat-value high-risk" id="highRiskCount">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Medium Risk</span>
+              <span class="stat-value medium-risk" id="mediumRiskCount">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Low Risk</span>
+              <span class="stat-value low-risk" id="lowRiskCount">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dashboard-card chart-container" id="risk-distribution-chart-container">
+          <h3>Risk Level Distribution</h3>
+          <canvas id="riskDistributionChart"></canvas>
+        </div>
+        
+        <div class="dashboard-card chart-container" id="transactions-over-time-chart-container">
+          <h3>Transactions Over Time</h3>
+          <canvas id="transactionsOverTimeChart"></canvas>
+        </div>
+        
+        <div class="dashboard-card chart-container" id="fraud-by-merchant-chart-container">
+          <h3>Top 5 Merchants by Fraud Rate</h3>
+          <canvas id="fraudByMerchantChart"></canvas>
+        </div>
+      </div>
+
+      <div class="transaction-table-container">
+        <div class="table-header">
+          <h3>Transaction History</h3>
+        </div>
+        <div class="table-wrapper">
+          <table id="transactionTable" class="transaction-table">
+            <thead>
+              <tr>
+                <th data-sort-key="Transaction_ID">Transaction ID</th>
+                <th data-sort-key="MerchantName">Merchant</th>
+                <th data-sort-key="Date">Date</th>
+                <th data-sort-key="Amount">Amount</th>
+                <th data-sort-key="Category">Risk Level</th>
+                <th data-sort-key="Fraud_Score">Fraud Score</th>
+                <th data-sort-key="Predicted_Class">Predicted Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transactionTableBody">
+              <!-- Transaction rows will be added here dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="noTransactions" class="info-message hidden">No transactions found matching the criteria.</div>
+      </div>
+    </div>
+
+    <div id="feedback-page" class="page">
+      <div class="page-header">
+        <h2>Transaction Verification</h2>
+        <p>Review transactions and confirm if they are actually fraudulent or legitimate.</p>
+      </div>
+      <div id="feedbackLoading" class="loading-indicator hidden">Loading feedback data...</div>
+      
+      <div class="feedback-container">
+        <h3>Transactions Pending Review</h3>
+        <div id="pendingFeedbackList">
+          <!-- Transactions pending feedback will be listed here -->
+        </div>
+        <div id="noFeedbackNeeded" class="info-message hidden">No transactions currently require review.</div>
+      </div>
+
+      <div class="feedback-stats section">
+        <h3>Verification Summary</h3>
+        <div id="feedbackStats">
+          <p>Total verifications completed: <span id="totalFeedbackCount">0</span></p>
+          <p>Confirmed as Fraud: <span id="confirmedFraudCount">0</span></p>
+          <p>Confirmed as Legitimate: <span id="confirmedLegitCount">0</span></p>
+        </div>
+        <!-- Removed download feedback log button -->
+      </div>
+    </div>
+
+    <div id="settings-page" class="page">
+      <div class="page-header">
+        <h2>System Settings</h2>
+      </div>
+      
+      <div class="section">
+        <h3>System Management</h3>
+        <div class="button-group">
+          <button id="resetAllDataButton" class="danger-button">
+            <span class="material-icons">delete</span> Reset My Transaction Data
+          </button>
+          <!-- Removed global clear buttons -->
+        </div>
+        
+        <!-- Removed Download Reports section -->
+      </div>
+      
+      <div class="section">
+        <h3>Profile Settings</h3>
+        <div class="profile-settings">
+          <div class="setting-option">
+            <label for="displayNameInput">Display Name:</label>
+            <div class="input-with-button">
+              <input type="text" id="displayNameInput" placeholder="Your display name">
+              <button id="updateDisplayNameBtn" class="primary-button small-button">
+                <span class="material-icons">check</span> Update
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h3>Appearance</h3>
+        <div class="setting-option">
+          <label for="themeSelector">Theme:</label>
+          <div class="theme-selector">
+            <button id="themeLightButton" class="theme-button light-theme">Light</button>
+            <button id="themeDarkButton" class="theme-button dark-theme">Dark</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h3>About FraudSense</h3>
+        <div class="about-info">
+          <p>FraudSense is an advanced credit card fraud detection system designed to help identify potentially fraudulent transactions.</p>
+          <p>Version: 1.1.0 (Firebase Integrated)</p>
+          <p>&copy; 2025 FraudSense</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-page" class="page">
+      <div class="page-header">
+        <h2>Admin Panel</h2>
+        <p>Administrative functions for system management</p>
+      </div>
+      
+      <div class="section">
+        <h3>Data Management</h3>
+        <div class="button-group">
+          <button id="downloadTransactionsButton" class="primary-button">
+            <span class="material-icons">cloud_download</span> Download All Transactions
+          </button>
+          <button id="downloadFeedbackButton" class="primary-button">
+            <span class="material-icons">description</span> Download All Feedback
+          </button>
+        </div>
+        <div class="button-group">
+          <button id="resetAllUsersDataButton" class="danger-button">
+            <span class="material-icons">delete_forever</span> Reset All Users' Transaction Data
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Send Transaction to User</h3>
+        <div class="admin-form">
+          <div class="input-group">
+            <label for="userDropdown">Select User:</label>
+            <div class="select-wrapper">
+              <select id="userDropdown">
+                <option value="">-- Select a user --</option>
+                <!-- Users will be loaded dynamically -->
+              </select>
+            </div>
+          </div>
+            <div class="input-group hidden">
+            <label for="targetUserEmail">User Email:</label>
+            <input type="email" id="targetUserEmail" placeholder="Email will be filled automatically" readonly />
+            </div>
+          
+          <div class="input-group">
+            <label for="transactionData">Transaction Data (JSON):</label>
+            <textarea id="transactionData" placeholder='{"V1": value1, "V2": value2, ..., "Amount": valueX, "MerchantName": "Example"}'></textarea>
+          </div>
+          
+          <div class="button-group">
+            <button id="sendTransactionButton" class="primary-button">
+              <span class="material-icons">send</span> Send Transaction
+            </button>
+            <button id="generateRandomAdminButton" class="secondary-button">
+              <span class="material-icons">casino</span> Generate Random
+            </button>
+          </div>
+          
+          <div id="adminTransactionResult" class="result-container"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>User Management</h3>
+        <div id="userListContainer" class="table-wrapper">
+          <table id="userTable" class="transaction-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Email</th>
+                <th>Display Name</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <!-- Users will be added here dynamically -->
+            </tbody>
+          </table>
+          <div id="noUsers" class="info-message hidden">No users found.</div>
+        </div>
+        <button id="refreshUsersButton" class="secondary-button">
+          <span class="material-icons">refresh</span> Refresh Users
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 FraudSense - Advanced Credit Card Fraud Detection System</p>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <button id="backToTopBtn" class="back-to-top" aria-label="Back to top">
+    <span class="material-icons">arrow_upward</span>
+  </button>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <!-- Your script.js -->
+  <script src="script.js" type="module"></script>
+</body>
+</html>
+

@@ -1,0 +1,10 @@
+Flask
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+imblearn
+joblib
+Flask-Cors
+firebase-admin
