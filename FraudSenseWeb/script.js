@@ -128,6 +128,12 @@ function setupAuthUI() {
             return;
         }
         
+        // Add password length validation
+        if (password.length < 8) {
+            errorElement.textContent = "Password must be at least 8 characters long";
+            return;
+        }
+        
         try {
             const userCredential = await auth.createUserWithEmailAndPassword(email, password);
             // Update profile with display name

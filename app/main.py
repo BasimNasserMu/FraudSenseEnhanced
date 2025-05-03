@@ -20,9 +20,28 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}}) # Allo
 
 # --- Firebase Initialization ---
 try:
-    # Path to your service account key file
-    SERVICE_ACCOUNT_KEY_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "serviceAccountKey.json")
-    cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_PATH)
+    # First try using environment variables
+    import json
+    import os
+    from firebase_admin import credentials, firestore, auth
+    
+    # Check if Firebase credentials are available in environment variable
+    firebase_creds_json = os.environ.get('FIREBASE_CREDENTIALS')
+    
+    if firebase_creds_json:
+        # Parse JSON from environment variable
+        print("Using Firebase credentials from environment variable")
+        cred_dict = json.loads(firebase_creds_json)
+        cred = credentials.Certificate(cred_dict)
+    else:
+        # Fall back to service account key file if available
+        SERVICE_ACCOUNT_KEY_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "serviceAccountKey.json")
+        if os.path.exists(SERVICE_ACCOUNT_KEY_PATH):
+            print("Using Firebase credentials from service account key file")
+            cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_PATH)
+        else:
+            raise FileNotFoundError("No Firebase credentials found in environment or as a file")
+    
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     print("Firebase Admin SDK initialized successfully.")
