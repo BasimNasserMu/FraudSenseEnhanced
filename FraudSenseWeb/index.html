@@ -64,11 +64,29 @@
         </ul>
       </nav>
       <div class="header-controls">
-        <div class="user-info">
-          <span id="user-displayname" class="user-displayname"></span>
-          <span id="user-email" class="user-email"></span>
+        <div class="profile-dropdown">
+          <button id="profileButton" class="profile-button">
+            <div class="profile-avatar">
+              <span id="userInitials">U</span>
+            </div>
+          </button>
+          <div id="profileDropdown" class="profile-dropdown-content">
+            <div class="profile-info">
+              <div class="profile-avatar-large">
+                <span id="userInitialsLarge">U</span>
+              </div>
+              <div class="profile-details">
+                <span id="user-displayname" class="user-displayname"></span>
+                <span id="user-email" class="user-email"></span>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button id="logout-btn" class="dropdown-item">
+              <span class="material-icons">logout</span>
+              Logout
+            </button>
+          </div>
         </div>
-        <button id="logout-btn" class="secondary-button">Logout</button>
         <button id="themeToggle" class="theme-toggle-button">
           <span class="material-icons">brightness_4</span>
         </button>
@@ -220,7 +238,7 @@
                 <th data-sort-key="Category">Risk Level</th>
                 <th data-sort-key="Fraud_Score">Fraud Score</th>
                 <th data-sort-key="Predicted_Class">Predicted Status</th>
-                <th>Actions</th>
+                <th>User's Feedback</th>
               </tr>
             </thead>
             <tbody id="transactionTableBody">
@@ -283,7 +301,7 @@
             <div class="input-with-button">
               <input type="text" id="displayNameInput" placeholder="Your display name">
               <button id="updateDisplayNameBtn" class="primary-button small-button">
-                <span class="material-icons">check</span> Update
+                <span class="material-icons">refresh</span>
               </button>
             </div>
           </div>

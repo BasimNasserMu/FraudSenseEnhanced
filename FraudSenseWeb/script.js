@@ -6,8 +6,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Backend API URL
-
+const merchants = ['Jarir Bookstore', 'Extra Stores', 'Danube', 'Panda', 'Albaik', 'STC'];
 // Global variables
 let riskDistributionChart = null;
 let transactionsOverTimeChart = null;
@@ -152,12 +151,52 @@ function setupAuthUI() {
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
         try {
+            // Close profile dropdown if open
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            if (profileDropdown) {
+                profileDropdown.classList.remove('active');
+            }
             await auth.signOut();
         } catch (error) {
             console.error("Logout failed:", error);
             alert("Logout failed: " + error.message);
         }
     });
+    
+    // Setup profile dropdown functionality
+    setupProfileDropdown();
+}
+
+// --- Profile Dropdown --- //
+function setupProfileDropdown() {
+    const profileButton = document.getElementById('profileButton');
+    const profileDropdown = document.querySelector('.profile-dropdown');
+    
+    if (profileButton) {
+        profileButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from bubbling to document
+            profileDropdown.classList.toggle('active');
+        });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!profileButton?.contains(e.target) && profileDropdown?.classList.contains('active')) {
+            profileDropdown.classList.remove('active');
+        }
+    });
+}
+
+// Function to generate user initials for avatar
+function generateUserInitials(displayName) {
+    if (!displayName) return "U";
+    
+    const names = displayName.trim().split(/\s+/);
+    if (names.length === 1) {
+        return names[0].charAt(0).toUpperCase();
+    } else {
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    }
 }
 
 // Global variable to track if user is admin
@@ -170,6 +209,10 @@ function handleAuthStateChanged(user) {
     const userDisplayNameElement = document.getElementById('user-displayname');
     const displayNameInput = document.getElementById('displayNameInput');
     const adminNavItem = document.getElementById('admin-nav-item');
+    
+    // Profile elements
+    const userInitials = document.getElementById('userInitials');
+    const userInitialsLarge = document.getElementById('userInitialsLarge');
 
     if (user) {
         currentUser = user;
@@ -180,6 +223,11 @@ function handleAuthStateChanged(user) {
         // Update header with user info
         userEmailElement.textContent = user.email;
         userDisplayNameElement.textContent = user.displayName || 'User';
+        
+        // Update profile avatar initials
+        const initials = generateUserInitials(user.displayName);
+        if (userInitials) userInitials.textContent = initials;
+        if (userInitialsLarge) userInitialsLarge.textContent = initials;
         
         // Set display name input in settings
         if (displayNameInput) {
@@ -203,6 +251,8 @@ function handleAuthStateChanged(user) {
         appContainer.classList.add('hidden');
         userEmailElement.textContent = '';
         userDisplayNameElement.textContent = '';
+        if (userInitials) userInitials.textContent = 'U';
+        if (userInitialsLarge) userInitialsLarge.textContent = 'U';
         if (adminNavItem) {
             adminNavItem.style.display = 'none';
         }
@@ -477,9 +527,7 @@ async function generateRandomTransaction() {
         for (let i = 0; i < headers.length; i++) {
             randomData[headers[i]] = parseFloat(randomLine[i]);
         }
-        
-        // Add a random merchant name
-        const merchants = ['Amazon', 'Walmart', 'Target', 'BestBuy', 'Ebay', 'Apple Store'];
+                
         const randomMerchant = merchants[Math.floor(Math.random() * merchants.length)];
         
         document.getElementById('jsonMerchantName').value = randomMerchant;
@@ -1489,13 +1537,20 @@ async function updateDisplayName() {
     }
     
     updateButton.disabled = true;
-    updateButton.innerHTML = '<span class="material-icons">hourglass_top</span> Updating...';
+    updateButton.innerHTML = '<span class="material-icons">hourglass_top</span>';
     
     try {
         await currentUser.updateProfile({ displayName: newDisplayName });
         
         // Update the display name in the header
         document.getElementById('user-displayname').textContent = newDisplayName;
+        
+        // Update profile avatar initials
+        const initials = generateUserInitials(newDisplayName);
+        const userInitials = document.getElementById('userInitials');
+        const userInitialsLarge = document.getElementById('userInitialsLarge');
+        if (userInitials) userInitials.textContent = initials;
+        if (userInitialsLarge) userInitialsLarge.textContent = initials;
         
         showGlobalSuccess("Display name updated successfully!");
         console.log("Display name updated to:", newDisplayName);
@@ -1504,7 +1559,7 @@ async function updateDisplayName() {
         showGlobalError(`Failed to update display name: ${error.message}`);
     } finally {
         updateButton.disabled = false;
-        updateButton.innerHTML = '<span class="material-icons">check</span> Update';
+        updateButton.innerHTML = '<span class="material-icons">refresh</span>';
     }
 }
 
@@ -1793,7 +1848,6 @@ async function generateRandomAdminTransaction() {
         }
         
         // Add a random merchant name
-        const merchants = ['Amazon', 'Walmart', 'Target', 'BestBuy', 'Ebay', 'Apple Store'];
         const randomMerchant = merchants[Math.floor(Math.random() * merchants.length)];
         randomData.MerchantName = randomMerchant;
         
