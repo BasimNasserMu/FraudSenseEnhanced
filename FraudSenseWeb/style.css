@@ -2447,7 +2447,7 @@ footer {
 }
 
 .auth-brand h1 .sense {
-  color: var(--text-light); 
+  color: var(--primary-light); 
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
